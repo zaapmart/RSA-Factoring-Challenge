@@ -1,44 +1,81 @@
-#!/usr/bin/env python
+# This is a Python script that factors large RSA numbers using the trial division method
+
 
 import sys
+import time
+from math import sqrt, ceil
 
-def factorize_numbers(file_path):
-    with open(file_path, 'r') as file:
-        for line in file:
-            # Remove newline characters and convert the string to an integer
-            number = int(line.strip())
 
-            # Factorize the number
-            factors = factorize(number)
+# A function to check if a number is a prime number
+def is_prime(n):
+    if n < 2:
+        return False
+    for i in range(2, int(sqrt(n)) + 1):
+        if n % i == 0:
+            return False
+    return True
 
-            # Print the factorization result
-            print(f"{number}={factors}")
 
-def factorize(n):
+# A function to factor a single RSA number using the trial division method
+def factor_rsa_number(n):
+    # Initialize an empty list to store the prime factors of n
     factors = []
-    divisor = 2
-
-    while divisor <= n:
-        if n % divisor == 0:
-            factors.append(divisor)
-            n = n // divisor
+    # Check if 2 is a factor of n
+    while n % 2 == 0:
+        factors.append(2)
+        n //= 2
+    # Check for odd prime factors up to sqrt(n)
+    i = 3
+    while i <= sqrt(n):
+        if n % i == 0:
+            factors.append(i)
+            n //= i
         else:
-            divisor += 1
+            i += 2
+    # If n is still greater than 2, it must be prime
+    if n > 2:
+        factors.append(n)
+    # If only one factor is found, return it as p and n//p as q
+    if len(factors) == 1:
+        p = factors[0]
+        q = n // p
+        return (p, q)
+    # If more than one factor is found, recursively factor each factor until all are prime
+    else:
+        pq = []
+        for factor in factors:
+            if is_prime(factor):
+                pq.append(factor)
+            else:
+                p, q = factor_rsa_number(factor)
+                pq.append(p)
+                pq.append(q)
+        return tuple(pq)
 
-    return '*'.join(map(str, factors))
 
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: factors <file>")
-        sys.exit(1)
+# Read the input file name from the command line arguments
+input_file = sys.argv[1]
 
-    file_path = sys.argv[1]
 
-    try:
-        factorize_numbers(file_path)
-    except FileNotFoundError:
-        print(f"Error: File '{file_path}' not found.")
-        sys.exit(1)
-    except Exception as e:
-        print(f"An error occurred: {e}")
-        sys.exit(1)
+# Read the RSA numbers from the input file
+with open(input_file, 'r') as f:
+    rsa_numbers = [int(line.strip()) for line in f.readlines()]
+
+
+# Start a timer to measure the execution time
+start_time = time.time()
+
+
+# Factor each RSA number in the file using the trial division method
+for n in rsa_numbers:
+    p, q = factor_rsa_number(n)
+    print(f"{n}={q}*{p}")
+
+
+# Stop the timer and calculate the execution time
+end_time = time.time()
+exec_time = end_time - start_time
+
+
+# Print the execution time in seconds
+print("Total execution time: ", exec_time, " seconds")
