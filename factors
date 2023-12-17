@@ -51,8 +51,7 @@ if __name__ == "__main__":
         num = int(line.strip())
         factors = factorize(num)
         if factors:
-        	print("{}={}*{}".format(num, factors[0], factors[1]))
-
+                print("{}={}*{}".format(num, factors[0], factors[1]))
 
 
         '''If the elapsed time exceeds 5 seconds,
@@ -61,4 +60,3 @@ if __name__ == "__main__":
     if time.time() - start_time > 5:
         print("Time limit exceeded")
         exit()
-
