@@ -3,17 +3,27 @@
 #include <math.h>
 #include <time.h>
 
+
+
 typedef struct {
     int factor1;
     int factor2;
 } Factorization;
 
+int min(int a, int b) {
+    return a < b ? a : b;
+}
+
+int max(int a, int b) {
+    return a > b ? a : b;
+}
+
 Factorization factorize(int num) {
     Factorization result = {0, 0};
     for (int i = 2; i <= sqrt(num); ++i) {
         if (num % i == 0) {
-            result.factor1 = i;
-            result.factor2 = num / i;
+            result.factor1 = min(i, num / i);
+            result.factor2 = max(i, num / i);
             return result;
         }
     }
@@ -42,7 +52,8 @@ int main(int argc, char *argv[]) {
         Factorization factors = factorize(num);
 
         if (factors.factor1 != 0) {
-            printf("%d=%d*%d\n", num, factors.factor1, factors.factor2);
+            printf("%d=%d*%d\n", num, min(factors.factor1, factors.factor2), max(factors.factor1, factors.factor2));
+
         }
 
         if (time(NULL) - start_time > 5) {
